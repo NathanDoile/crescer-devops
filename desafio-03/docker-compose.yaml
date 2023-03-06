@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=minhaRedeSocial
+      - POSTGRES_PASSWORD=minhaRedeSocial
+      - POSTGRES_DB=minhaRedeSocial
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@cwi.com.br
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    volumes:
+      - pgadmin-volume:/var/lib/pgadmin
+    ports:
+      - "9000:80"
+    networks:
+      - app
+
+  app:
+    container_name: minha-rede-social-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - spring.datasource.url=jdbc:postgresql://8008:postgres/POSTGRES_DB
+    ports:
+      - "9091:8080"
+    networks:
+      - app
+    depends_on:
+      - postgres
+      - pgadmin
+
+volumes:
+  postgres-volume:
+  pgadmin-volume:
+
+networks:
+  app:
